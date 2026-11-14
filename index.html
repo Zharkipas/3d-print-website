@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Layerwork – 3D printed goods</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef0f3;--surface:#fff;--ink:#17202b;--muted:#5a6675;--line:#d5dae1;--accent:#2f4bff;--accent-ink:#fff;--warn:#b3261e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10151c;--surface:#1a212b;--ink:#eef1f5;--muted:#9aa6b6;--line:#2b3441;--accent:#7f93ff;--accent-ink:#0b1020;--warn:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10151c;--surface:#1a212b;--ink:#eef1f5;--muted:#9aa6b6;--line:#2b3441;--accent:#7f93ff;--accent-ink:#0b1020;--warn:#ff8a80;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 Figtree,system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;line-height:1.05}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header.top{display:flex;justify-content:space-between;align-items:center;padding:18px 0}
+.logo{font:800 22px "Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
+.cartbtn{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:10px 18px;font-weight:600;cursor:pointer}
+.hero{position:relative;padding:56px 0 64px;overflow:hidden}
+.hero h1{font-size:clamp(40px,8vw,88px);font-weight:800;letter-spacing:-.035em;max-width:11ch}
+.hero p{max-width:46ch;color:var(--muted);font-size:18px;margin:20px 0 28px}
+.layers{position:absolute;right:-40px;top:0;bottom:0;width:min(46%,420px);opacity:.9;
+background:repeating-linear-gradient(0deg,var(--accent) 0 3px,transparent 3px 9px);
+-webkit-mask:radial-gradient(ellipse at 60% 50%,#000 30%,transparent 72%);mask:radial-gradient(ellipse at 60% 50%,#000 30%,transparent 72%)}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:12px 20px;font-weight:600;cursor:pointer;display:inline-block;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;padding-bottom:56px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.thumb{aspect-ratio:4/3;display:grid;place-items:center;transition:background .2s}
+.thumb svg{width:56%;height:auto}
+.body{padding:16px;display:flex;flex-direction:column;gap:10px;flex:1}
+.body h3{font-size:20px}
+.body p{margin:0;color:var(--muted);font-size:14px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto}
+.price{font:800 20px "Bricolage Grotesque",sans-serif}
+.swatches{display:flex;gap:8px}
+.sw{width:26px;height:26px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1.5px var(--line);cursor:pointer;padding:0}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2.5px var(--ink)}
+.add{padding:9px 14px;border-radius:9px}
+section.info{border-top:1px solid var(--line);padding:40px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:28px}
+section.info h3{font-size:20px;margin-bottom:6px}
+section.info p{margin:0;color:var(--muted)}
+footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+/* cart drawer */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--surface);border-left:1px solid var(--line);transform:translateX(105%);transition:transform .25s;z-index:20;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.drawer.open{transform:none}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+.dh h2{font-size:24px}
+.dbody{overflow:auto;padding:16px 20px;flex:1}
+.item{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.item small{color:var(--muted)}
+.qty{display:flex;align-items:center;gap:8px;margin-top:4px}
+.qty button{width:28px;height:28px;border-radius:7px;border:1.5px solid var(--line);background:none;cursor:pointer}
+.total{display:flex;justify-content:space-between;font-weight:600;padding:14px 0}
+label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
+input,textarea{width:100%;padding:10px 12px;border-radius:9px;border:1.5px solid var(--line);background:var(--bg)}
+.err{color:var(--warn);font-size:14px;min-height:20px;margin:8px 0 0}
+.empty{color:var(--muted);padding:30px 0}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s;z-index:10}
+.scrim.open{opacity:1;pointer-events:auto}
+.done{background:var(--bg);border-radius:12px;padding:16px;margin-top:12px}
+.done pre{white-space:pre-wrap;font:13px/1.5 ui-monospace,monospace;margin:8px 0 0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">Layerwork</div>
+    <button class="cartbtn" id="openCart" aria-label="Open cart">Cart (<span id="count">0</span>)</button>
+  </header>
+
+  <div class="hero">
+    <div class="layers" aria-hidden="true"></div>
+    <h1>Tabletop gear, printed layer by layer.</h1>
+    <p>3D printed terrain, garrisons, counters and holders for your Gundam, One Piece and Pokémon games. Add to cart and send your order in under a minute.</p>
+    <a class="btn" href="#shop">Browse products</a>
+  </div>
+
+  <h2 id="shop" style="font-size:32px;margin-bottom:20px">Shop</h2>
+  <div class="grid" id="grid"></div>
+
+  <section class="info">
+    <div><h3>Made to order</h3><p>Every item is printed after you order, usually within 3–5 days.</p></div>
+    <div><h3>Choose your colour</h3><p>Most items come in several filament colours. Need something custom? Add a note at checkout.</p></div>
+    <div><h3>How ordering works</h3><p>Place your order on this page. We reply with the total, shipping and payment details, then print.</p></div>
+  </section>
+  <footer>© Layerwork. Edit the SHOP settings in the page code to set your contact details.</footer>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Cart">
+  <div class="dh"><h2>Your cart</h2><button class="btn ghost add" id="closeCart">Close</button></div>
+  <div class="dbody" id="dbody"></div>
+</aside>
+
+<script>
+/* ===== EDIT THESE ===== */
+var SHOP = {
+  name: "Layerwork",
+  currency: "$",
+  sheetUrl: "https://script.google.com/macros/s/AKfycby6m7dpf0saxwu2F87WQGzj6BHVie7Jjq29tCl0hzmha6Z2T9BTazffFRBLWIHU8jA/exec",                  // paste your Google Apps Script Web app URL here (see apps-script.gs)
+  email: "orders@example.com",   // backup: used if the sheet is not set up or sending fails
+  whatsapp: ""                   // e.g. "6591234567" (country code, no +). Leave empty to hide.
+};
+var COLORS = {Black:"#222831",Blue:"#2f4bff",Red:"#d7263d","Lime Green":"#8fd400","Red & Blue":"#8a93a6"};
+var PRODUCTS = [
+  {id:1,name:"Gundam Assemble Terrain",price:15,desc:"Full Set of Lvl 1 & Lvl 2 terrain similar to Starter set",colors:["Red","Blue","Lime Green","Black"],shape:"terrain"},
+  {id:2,name:"Gundam Assemble Garrison",price:2.5,desc:"8 red & 8 blue Garrison.",colors:["Red & Blue"],shape:"garrison"},
+  {id:3,name:"Pokémon Coin Holder (42mm)",price:0.25,desc:"1 holder.",colors:["Red","Blue","Lime Green","Black"],shape:"coin"},
+  {id:4,name:"One Piece Counter",price:2.5,desc:"2 counters.",colors:["Red","Blue","Lime Green","Black"],shape:"counter"}
+];
+/* ===== END EDIT ===== */
+
+var SHAPES = {
+  stand:'<path d="M20 90 L50 30 L80 30 L70 90 Z M10 90 H110 V100 H10Z"/>',
+  pot:'<path d="M25 40 H95 L82 100 H38 Z M25 40 L60 20 L95 40"/>',
+  clip:'<path d="M20 70 a15 15 0 1 1 30 0 v20 h-30z M65 70 a15 15 0 1 1 30 0 v20 h-30z"/>',
+  hook:'<path d="M20 20 H100 V35 H35 V90 H20Z M35 70 a20 20 0 0 0 40 0 V55 H60 V70 a5 5 0 0 1-10 0Z"/>',
+  dragon:'<path d="M15 80 q20-50 45-30 q20 15 30-20 l10 10 q-5 40-35 50 q-25 8-50-10Z"/>',
+  plate:'<path d="M10 40 H110 V80 H10Z"/>',
+  terrain:'<path d="M10 100 V70 H45 V50 H80 V30 H110 V100Z"/>',
+  garrison:'<path fill="#d7263d" d="M12 55 H50 L58 85 H6Z"/><path fill="#2f4bff" d="M64 55 H102 L110 85 H58Z"/>',
+  coin:'<path fill-rule="evenodd" d="M15 60 a45 45 0 1 0 90 0 a45 45 0 1 0 -90 0Z M35 60 a25 25 0 1 0 50 0 a25 25 0 1 0 -50 0Z"/>',
+  counter:'<path d="M25 45 a35 15 0 0 1 70 0 V80 a35 15 0 0 1 -70 0Z"/>'
+};
+var cart = {}; // key "id|color" -> qty
+var chosen = {}; // id -> color
+var fmt = function(n){return SHOP.currency + n.toFixed(2)};
+
+function thumb(p){
+  var c = COLORS[chosen[p.id]];
+  return '<div class="thumb" id="th'+p.id+'" style="background:color-mix(in srgb,'+c+' 14%,var(--bg))">'+
+   '<svg viewBox="0 0 120 120" fill="'+c+'" stroke="var(--ink)" stroke-opacity=".25" stroke-width="1.5" role="img" aria-label="'+p.name+' in '+chosen[p.id]+'">'+SHAPES[p.shape]+'</svg></div>';
+}
+function renderGrid(){
+  var g = document.getElementById('grid');
+  g.innerHTML = PRODUCTS.map(function(p){
+    chosen[p.id] = chosen[p.id] || p.colors[0];
+    return '<article class="card">'+thumb(p)+'<div class="body"><h3>'+p.name+'</h3><p>'+p.desc+'</p>'+
+     (p.colors.length>1?'<div class="swatches" role="group" aria-label="Colour">'+p.colors.map(function(c){
+        return '<button class="sw" title="'+c+'" aria-label="'+c+'" aria-pressed="'+(chosen[p.id]===c)+'" data-pid="'+p.id+'" data-color="'+c+'" style="background:'+COLORS[c]+'"></button>';
+     }).join('')+'</div>':'')+
+     '<div class="row"><span class="price">'+fmt(p.price)+'</span><button class="btn add" data-add="'+p.id+'">Add to cart</button></div></div></article>';
+  }).join('');
+}
+function count(){return Object.keys(cart).reduce(function(s,k){return s+cart[k]},0)}
+function lines(){
+  return Object.keys(cart).map(function(k){
+    var parts=k.split('|'),p=PRODUCTS.filter(function(x){return x.id==parts[0]})[0];
+    return {key:k,p:p,color:parts[1],qty:cart[k],sub:p.price*cart[k]};
+  });
+}
+function total(){return lines().reduce(function(s,l){return s+l.sub},0)}
+function renderCart(done){
+  document.getElementById('count').textContent = count();
+  var b = document.getElementById('dbody'), L = lines();
+  if(done){b.innerHTML = done;return}
+  if(!L.length){b.innerHTML='<p class="empty">Your cart is empty. Add something from the shop.</p>';return}
+  b.innerHTML = L.map(function(l){
+    return '<div class="item"><div><strong>'+l.p.name+'</strong><br><small>'+l.color+' · '+fmt(l.p.price)+' each</small>'+
+     '<div class="qty"><button data-dec="'+l.key+'" aria-label="Decrease">−</button><span>'+l.qty+'</span><button data-inc="'+l.key+'" aria-label="Increase">+</button></div></div>'+
+     '<strong>'+fmt(l.sub)+'</strong></div>';
+  }).join('') +
+  '<div class="total"><span>Subtotal</span><span>'+fmt(total())+'</span></div>'+
+  '<p style="color:var(--muted);font-size:14px;margin:0">Shipping is confirmed when we reply to your order.</p>'+
+  '<label for="f-name">Name</label><input id="f-name" autocomplete="name">'+
+  '<label for="f-contact">Email or phone</label><input id="f-contact" autocomplete="email">'+
+  '<label for="f-addr">Delivery address</label><textarea id="f-addr" rows="2" autocomplete="street-address"></textarea>'+
+  '<label for="f-note">Order notes (custom text, deadlines)</label><textarea id="f-note" rows="2"></textarea>'+
+  '<p class="err" id="err" role="alert"></p>'+
+  '<button class="btn" style="width:100%" id="place">Place order</button>';
+}
+function orderText(f){
+  var t = 'New order for '+SHOP.name+'\n\n';
+  lines().forEach(function(l){t += l.qty+' x '+l.p.name+' ('+l.color+') – '+fmt(l.sub)+'\n'});
+  t += '\nSubtotal: '+fmt(total())+'\n\nName: '+f.name+'\nContact: '+f.contact+'\nAddress: '+f.addr+'\nNotes: '+(f.note||'None');
+  return t;
+}
+function place(){
+  var f={name:v('f-name'),contact:v('f-contact'),addr:v('f-addr'),note:v('f-note')};
+  if(!f.name||!f.contact||!f.addr){document.getElementById('err').textContent='Enter your name, contact and delivery address to place the order.';return}
+  var text = orderText(f);
+  if(!SHOP.sheetUrl){fallback(f,text);return}
+  var btn = document.getElementById('place');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  var payload = {name:f.name,contact:f.contact,address:f.addr,notes:f.note,
+    items:lines().map(function(l){return l.qty+' x '+l.p.name+' ('+l.color+')'}).join('; '),
+    subtotal:total()};
+  fetch(SHOP.sheetUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
+    .then(function(){
+      cart = {};
+      renderCart('<h3 style="font-size:22px">Order received</h3><p>Thanks, '+esc(f.name)+'! We’ll contact you at '+esc(f.contact)+' with the final total, shipping and payment details.</p><div class="done"><strong>Order summary</strong><pre id="otext"></pre></div>');
+      document.getElementById('otext').textContent = text;
+    })
+    .catch(function(){fallback(f,text)});
+}
+function esc(s){return s.replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function fallback(f,text){
+  var enc = encodeURIComponent(text);
+  var mail = 'mailto:'+SHOP.email+'?subject='+encodeURIComponent('Order from '+f.name)+'&body='+enc;
+  var wa = SHOP.whatsapp ? 'https://wa.me/'+SHOP.whatsapp+'?text='+enc : '';
+  var html = '<h3 style="font-size:22px">Order ready to send</h3><p>Send it by email'+(wa?' or WhatsApp':'')+'. We’ll reply with the final total and payment details.</p>'+
+    '<a class="btn" style="width:100%;text-align:center;margin-bottom:8px" href="'+mail+'">Send by email</a>'+
+    (wa?'<a class="btn ghost" style="width:100%;text-align:center;margin-bottom:8px" target="_blank" rel="noopener" href="'+wa+'">Send by WhatsApp</a>':'')+
+    '<button class="btn ghost" style="width:100%" id="copy">Copy order text</button>'+
+    '<div class="done"><strong>Order summary</strong><pre id="otext"></pre></div>';
+  renderCart(html);
+  document.getElementById('otext').textContent = text;
+}
+function v(id){var e=document.getElementById(id);return e?e.value.trim():''}
+function open(o){document.getElementById('drawer').classList.toggle('open',o);document.getElementById('scrim').classList.toggle('open',o);if(o)renderCart()}
+
+document.addEventListener('click',function(e){
+  var t=e.target;
+  if(t.dataset.color){chosen[t.dataset.pid]=t.dataset.color;
+    var p=PRODUCTS.filter(function(x){return x.id==t.dataset.pid})[0];
+    document.getElementById('th'+p.id).outerHTML=thumb(p);
+    t.parentNode.querySelectorAll('.sw').forEach(function(s){s.setAttribute('aria-pressed',s===t)})}
+  else if(t.dataset.add){var k=t.dataset.add+'|'+chosen[t.dataset.add];cart[k]=(cart[k]||0)+1;
+    document.getElementById('count').textContent=count();t.textContent='Added';setTimeout(function(){t.textContent='Add to cart'},900)}
+  else if(t.dataset.inc){cart[t.dataset.inc]++;renderCart()}
+  else if(t.dataset.dec){if(--cart[t.dataset.dec]<=0)delete cart[t.dataset.dec];renderCart()}
+  else if(t.id==='place')place();
+  else if(t.id==='copy'){try{navigator.clipboard.writeText(document.getElementById('otext').textContent);t.textContent='Copied'}catch(x){t.textContent='Select the text below to copy'}}
+  else if(t.id==='openCart')open(true);
+  else if(t.id==='closeCart'||t.id==='scrim')open(false);
+});
+renderGrid();renderCart();
+</script>
+</body>
+</html>
